@@ -1,0 +1,55 @@
+import pandas as pd
+from PyPDF2 import PdfFileReader
+import os.path, time
+import filetype
+from os import listdir
+from os.path import isfile, join
+import zipfile, lxml.etree
+import warnings
+warnings.filterwarnings("ignore")
+
+
+def files_metadata(csvname):
+    x=input("Enter your directory path:")
+    files_list = [f for f in listdir(x) if isfile(join(x, f))]
+    Name=[]
+    Type=[]
+    FSize=[]
+    Author=[]
+    Created=[]
+    Mod=[]
+    for i in range(len(files_list)):
+        fname=files_list[i]
+        Name.append(fname)
+        extension = os.path.splitext(files_list[i])[1]
+        Type.append(extension)
+        f=os.path.getsize(x+'\\'+files_list[i])
+        FSize.append(f)
+        try:   # For Author
+            zf = zipfile.ZipFile(x+'\\'+files_list[i])
+            doc = lxml.etree.fromstring(zf.read('docProps/core.xml'))
+            ns={'dc': 'http://purl.org/dc/elements/1.1/'}
+            creator = doc.xpath('//dc:creator', namespaces=ns)[0].text
+            Author.append(creator)
+        except:
+            try:
+                with open(x+'\\'+files_list[i], 'rb') as f:
+                    pdf = PdfFileReader(f)
+                    info = pdf.getDocumentInfo()
+                    number_of_pages = pdf.getNumPages()
+                    author = info.author
+                    Author.append(author)
+            except:
+                x1="NA"
+                Author.append(x1)
+        ct=time.ctime(os.path.getctime(x+'\\'+files_list[i]))
+        Created.append(ct)
+        md=time.ctime(os.path.getmtime(x+'\\'+files_list[i]))
+        Mod.append(md)
+    dict = {'File Name': Name, 'File Type': Type, 'File Size': FSize, 'Author':Author, 'Created':Created, 'Modified':Mod}    
+    df = pd.DataFrame(dict)
+    csvfile=df.to_csv(str(csvname))
+    print("Your Required CSV File is succesfully Downloaded")
+    #return df
+    return csvfile
+    files_metadata('test1.csv')
