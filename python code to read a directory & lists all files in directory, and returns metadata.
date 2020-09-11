@@ -1,3 +1,7 @@
+#A python code that reads a directory, lists all the files found in that directory and returns metadata about the files (filename, filetype, filesize (MB/KB/etc.), Author, Creation Date, Last Modified Date, …)
+#These should be output as a csv file, with 1 file per row. It should be tested against a variety of files: JPG, PNG, .XLSX, …others?
+#The code should be written as a function that can be called, where it takes as input the working directory of interest, and any other pertinent parameters. It should return a CSV file as output, whose name should be specified as a parameter input to the function.
+
 import pandas as pd
 from PyPDF2 import PdfFileReader
 import os.path, time
